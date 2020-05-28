@@ -99,21 +99,28 @@ void eliminareProductiiLambda(){
     }
 
 }
-/*void redenumire(){
-    for(int i = 0; i < 128; i++)
-        if(!productii[i].empty()){
-            set<string> nou;
-            string sc;
-            sc = char(i);
-            for(auto x : productii[i])
-                if(sc != x)
-                    nou.insert(sc);
-            productii[i].clear();
-            for(auto x : nou)
-                productii[i].insert(x);
-        }
-}*/
 
+void redenumire() {
+    int ok = 0;
+    while (ok == 0) {
+        for (int i = 0; i < 128; i++)
+            if (!productii[i].empty()) {
+                set<string> nou;
+                for (auto x : productii[i])
+                    if(x.size() == 1)
+                    {for (auto y : neterminale)
+                        if (x[0] != y)
+                            nou.insert(x);
+                        }
+                if (productii[i] == nou)
+                    ok = 1;
+                productii[i].clear();
+                for (auto y : nou)
+                    productii[i].insert(y);
+
+            }
+    }
+}
 //Pasul 2: Eliminam redenumirile
 void eliminareaRedenumirilor(){
     //Elimin starile X->X
@@ -128,29 +135,29 @@ void eliminareaRedenumirilor(){
                 productii[i].insert(x);
         }
 
-    afisare();
+    set<string> copie[128];
     //Inlocuiesc X->Y
-    for(int i = 0; i < 128; i++) {
-        set<string> nou;
-        if (!productii[i].empty())
-            for (auto x : productii[i])
-                if (x.size() != 1) //daca au mai mult de 1 simbol, le pastram
-                        nou.insert(x);
-                else{ int ok = 0;
-                    for (auto y : neterminale) //daca e stare neterminala
-                        if (y == x[0])
-                            ok = 1;
-                        if (ok == 0)
-                            nou.insert(x);
-                        else {
-                            for (auto z : productii[int(x[0])] ) //daca am eliminat o stare, adaug toate starile din productiile acesteia
-                                nou.insert(z);
-                        }
-                }
-                productii[i].clear();
-                for (auto x : nou)
-                    productii[i].insert(x);  //noua productie
+    bool redenumiri = false;
+    while(!redenumiri)
+    {   redenumiri = true;
+        for(int i = 0; i < 128; i++) {
+            copie[i] = productii[i];
+            productii[i].clear();
+        if (!copie[i].empty())
+            for (auto x : copie[i])
+                if(x.size() == 1 && neterminale.find(x[0])!= neterminale.end())
+                    {
+                        for(auto z : productii[int(x[0])])
+                            productii[i].insert(z);
+                        redenumiri = false;
+                    }
+                else
+                    productii[i].insert(x);
+
     }
+
+    }
+
 }
 int Infinite(string a, set<string> &folosite){
     queue<string> s;
